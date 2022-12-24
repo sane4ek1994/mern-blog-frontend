@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useRef, useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
 import TextField from '@mui/material/TextField'
@@ -14,12 +14,12 @@ import styles from './AddPost.module.scss'
 export const AddPost = () => {
   const navigate = useNavigate()
   const isAuth = useSelector(selectIsAuth)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [imageUrl, setImageUrl] = React.useState('')
-  const [text, setText] = React.useState('')
-  const [title, setTitle] = React.useState('')
-  const [tags, setTags] = React.useState('')
-  const inputFileRef = React.useRef(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
+  const [text, setText] = useState('')
+  const [title, setTitle] = useState('')
+  const [tags, setTags] = useState('')
+  const inputFileRef = useRef(null)
 
   const handleChangeFile = async event => {
     try {
@@ -35,11 +35,13 @@ export const AddPost = () => {
   }
 
   const onClickRemoveImage = () => {
-    alert('Удалить?')
-    setImageUrl('')
+    const isDeleted = window.confirm('Удалить?')
+    if (isDeleted) {
+      setImageUrl('')
+    }
   }
 
-  const onChange = React.useCallback(value => {
+  const onChange = useCallback(value => {
     setText(value)
   }, [])
 
@@ -64,7 +66,7 @@ export const AddPost = () => {
     }
   }
 
-  const options = React.useMemo(
+  const options = useMemo(
     () => ({
       spellChecker: false,
       maxHeight: '400px',
