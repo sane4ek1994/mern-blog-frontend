@@ -6,20 +6,37 @@ import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import SimpleMDE from 'react-simplemde-editor'
 import { selectIsAuth } from '../../redux/slice/auth'
+import axios from '../../axios'
 
 import 'easymde/dist/easymde.min.css'
 import styles from './AddPost.module.scss'
 
 export const AddPost = () => {
   const isAuth = useSelector(selectIsAuth)
-  const imageUrl = ''
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [imageUrl, setImageUrl] = React.useState('')
   const [value, setValue] = React.useState('')
   const [title, setTitle] = React.useState('')
   const [tags, setTags] = React.useState('')
+  const inputFileRef = React.useRef(null)
 
-  const handleChangeFile = () => {}
+  const handleChangeFile = async event => {
+    try {
+      const formData = new FormData()
+      const file = event.target.files[0]
+      formData.append('image', file)
+      const { data } = await axios.post('/uploads', formData)
+      setImageUrl(data.url)
+    } catch (err) {
+      console.warn(err)
+      alert('Не удалось загрузить файл...')
+    }
+  }
 
-  const onClickRemoveImage = () => {}
+  const onClickRemoveImage = () => {
+    alert('Удалить?')
+    setImageUrl('')
+  }
 
   const onChange = React.useCallback(value => {
     setValue(value)
@@ -46,16 +63,18 @@ export const AddPost = () => {
 
   return (
     <Paper style={{ padding: 30 }}>
-      <Button variant='outlined' size='large'>
+      <Button onClick={() => inputFileRef.current.click()} variant='outlined' size='large'>
         Загрузить превью
       </Button>
-      <input type='file' onChange={handleChangeFile} hidden />
+      <input ref={inputFileRef} type='file' onChange={handleChangeFile} hidden />
       {imageUrl && (
-        <Button variant='contained' color='error' onClick={onClickRemoveImage}>
-          Удалить
-        </Button>
+        <>
+          <Button variant='contained' color='error' onClick={onClickRemoveImage}>
+            Удалить
+          </Button>
+          <img className={styles.image} src={`http://localhost:4444${imageUrl}`} alt='Uploaded' />
+        </>
       )}
-      {imageUrl && <img className={styles.image} src={`http://localhost:4444${imageUrl}`} alt='Uploaded' />}
       <br />
       <br />
       <TextField
